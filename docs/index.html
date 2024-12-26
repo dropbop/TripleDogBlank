@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Card Game</title>
+    <title>Card Game Simulation</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <h1>My Card Game</h1>
-        <div id="game-board">
-            <!-- Cards or other game elements will go here -->
+    <div id="simulation-container">
+        <h1>Card Game Simulation</h1>
+        
+        <!-- Input Fields -->
+        <div class="input-group">
+            <label for="num-decks">Number of Decks:</label>
+            <input type="number" id="num-decks" value="1" min="1">
         </div>
-        <button id="start-button">Start Game</button>
-        <p id="status-message">Press "Start Game" to begin!</p>
+        <div class="input-group">
+            <label for="num-games">Number of Games to Simulate:</label>
+            <input type="number" id="num-games" value="1000" min="1">
+        </div>
+        
+        <!-- Run Simulation Button -->
+        <button id="run-simulation">Run Simulation</button>
+        
+        <!-- Simulation Results -->
+        <div id="simulation-results">
+            <h2>Results</h2>
+            <pre id="results-output"></pre>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
