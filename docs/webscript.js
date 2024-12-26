@@ -3,7 +3,7 @@ function simulateWar(numSimulations = 1000, numDecks = 1) {
     const gameLengths = [];
     const outcomes = []; // 0 for player 1 wins, 1 for player 2 wins, -1 for tie/max rounds
 
-    for (let i = 0; i < numSimulations; i++) {
+    for (let sim = 0; sim < numSimulations; sim++) {
         // Create the deck(s)
         let deck = [];
         for (let d = 0; d < numDecks; d++) {
@@ -34,44 +34,57 @@ function simulateWar(numSimulations = 1000, numDecks = 1) {
             } else if (card2.rank > card1.rank) {
                 player2.push(card2, card1);
             } else { // War
-                const warPile = [card1, card2];
+                let warPile = [card1, card2];
+                let nextCard1, nextCard2;
+
                 while (card1.rank === card2.rank && player1.length > 0 && player2.length > 0) {
-                    if (player1.length < 4) { // Player 1 doesn't have enough cards for war
-                        warPile.push(...player1.splice(0, player1.length));
-                        break;
-                    } else if (player2.length < 4) { // Player 2 doesn't have enough cards for war
-                        warPile.push(...player2.splice(0, player2.length));
-                        break;
-                    } else { // Both players have enough cards
-                        for (let j = 0; j < 3; j++) { // Put down 3 cards face down
-                            warPile.push(player1.shift(), player2.shift());
-                        }
+                    // Take 3 face-down cards if possible
+                    for (let j = 0; j < 3; j++) {
+                        if (player1.length > 0) warPile.push(player1.shift());
+                        if (player2.length > 0) warPile.push(player2.shift());
+                    }
 
-                        if (player1.length === 0 || player2.length === 0) { // Check if a player ran out of cards
-                            break;
-                        }
-
-                        const nextCard1 = player1.shift(); // Next face-up card
-                        const nextCard2 = player2.shift();
+                    // Draw next face-up cards
+                    if (player1.length > 0 && player2.length > 0) {
+                        nextCard1 = player1.shift();
+                        nextCard2 = player2.shift();
                         warPile.push(nextCard1, nextCard2);
+                    } else {
+                        // If any player can't draw, they lose the war
+                        break;
+                    }
+
+                    if (nextCard1.rank > nextCard2.rank) {
+                        player1.push(...warPile);
+                        break;
+                    } else if (nextCard2.rank > nextCard1.rank) {
+                        player2.push(...warPile);
+                        break;
+                    } else {
+                        // Continue war with the new cards
+                        card1 = nextCard1;
+                        card2 = nextCard2;
                     }
                 }
 
-                if (player1.length > 0 && (player2.length === 0 || nextCard1.rank > nextCard2.rank)) {
-                    player1.push(...warPile);
-                } else if (player2.length > 0 && (player1.length === 0 || nextCard2.rank > nextCard1.rank)) {
-                    player2.push(...warPile);
+                // If one player runs out of cards during war
+                if (player1.length === 0 || player2.length === 0) {
+                    if (player1.length > player2.length) {
+                        player1.push(...warPile);
+                    } else {
+                        player2.push(...warPile);
+                    }
                 }
             }
         }
 
         gameLengths.push(rounds);
-        if (player2.length === 0) {
-            outcomes.push(0);
-        } else if (player1.length === 0) {
-            outcomes.push(1);
+        if (player1.length > 0) {
+            outcomes.push(0); // Player 1 wins
+        } else if (player2.length > 0) {
+            outcomes.push(1); // Player 2 wins
         } else {
-            outcomes.push(-1);
+            outcomes.push(-1); // Tie or max rounds reached
         }
     }
 
